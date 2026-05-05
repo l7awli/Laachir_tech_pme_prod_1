@@ -1,0 +1,2779 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laachir-Tech - Interface Gérant</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --night: #0D1B2A;
+            --navy: #1B2D4F;
+            --blue: #1565C0;
+            --cyan: #00B4D8;
+            --cyan-light: #48CAE4;
+            --mint: #2ECC71;
+            --coral: #FF6B35;
+            --alert: #F59E0B;
+            --danger: #EF4444;
+            --bg: #F0F4F8;
+            --card: #FFFFFF;
+            --text: #1B2D4F;
+            --muted: #64748B;
+            --border: #E2E8F0;
+            --shadow: 0 4px 24px rgba(13,27,42,0.10);
+            --shadow-lg: 0 8px 40px rgba(13,27,42,0.16);
+            --radius: 14px;
+            --radius-sm: 8px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* App Layout */
+        .app {
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 64px;
+            background: var(--night);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 0;
+            gap: 8px;
+            transition: width 0.3s ease;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 100;
+        }
+
+        .sidebar.expanded {
+            width: 220px;
+        }
+
+        .sidebar-logo {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--cyan), var(--blue));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            margin-bottom: 16px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .sidebar-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .nav-item {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            overflow: hidden;
+            gap: 12px;
+            padding: 0 12px;
+            flex-shrink: 0;
+            white-space: nowrap;
+        }
+
+        .sidebar.expanded .nav-item {
+            width: 196px;
+        }
+
+        .nav-item:hover {
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .nav-item.active {
+            background: rgba(0, 180, 216, 0.18);
+        }
+
+        .nav-item.active .nav-icon {
+            color: var(--cyan);
+        }
+
+        .nav-icon {
+            font-size: 18px;
+            flex-shrink: 0;
+            color: rgba(255, 255, 255, 0.45);
+        }
+
+        .nav-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .sidebar.expanded .nav-label {
+            opacity: 1;
+        }
+
+        .sidebar-bottom {
+            margin-top: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--coral), var(--alert));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Topbar */
+        .topbar {
+            background: white;
+            padding: 16px 28px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .topbar-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .topbar-sub {
+            font-size: 12px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .topbar-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 9px 18px;
+            border-radius: var(--radius-sm);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--cyan);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--cyan-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 180, 216, 0.35);
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--cyan);
+            color: var(--cyan);
+        }
+
+        .btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-success {
+            background: var(--mint);
+            color: white;
+        }
+
+        .btn-success:hover {
+            filter: brightness(1.1);
+        }
+
+        /* Content */
+        .content {
+            padding: 28px;
+            flex: 1;
+        }
+
+        /* Screens */
+        .screen {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* KPI Cards */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 22px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .kpi-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 80px;
+            height: 80px;
+            border-radius: 0 var(--radius) 0 80px;
+            opacity: 0.07;
+        }
+
+        .kpi-card.cyan::after {
+            background: var(--cyan);
+        }
+
+        .kpi-card.mint::after {
+            background: var(--mint);
+        }
+
+        .kpi-card.coral::after {
+            background: var(--coral);
+        }
+
+        .kpi-card.alert::after {
+            background: var(--alert);
+        }
+
+        .kpi-icon {
+            font-size: 22px;
+            margin-bottom: 12px;
+        }
+
+        .kpi-val {
+            font-size: 32px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .kpi-val.cyan {
+            color: var(--cyan);
+        }
+
+        .kpi-val.mint {
+            color: var(--mint);
+        }
+
+        .kpi-val.coral {
+            color: var(--coral);
+        }
+
+        .kpi-val.alert {
+            color: var(--alert);
+        }
+
+        .kpi-label {
+            font-size: 13px;
+            color: var(--muted);
+            font-weight: 500;
+        }
+
+        /* Grid */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 22px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .card-body {
+            padding: 18px 22px;
+        }
+
+        /* Intervention Rows */
+        .intervention-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .intervention-row:hover {
+            background: var(--bg);
+        }
+
+        .intervention-row:last-child {
+            border-bottom: none;
+        }
+
+        .int-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .int-avatar.clim {
+            background: rgba(0, 180, 216, 0.12);
+        }
+
+        .int-avatar.plomb {
+            background: rgba(46, 204, 113, 0.12);
+        }
+
+        .int-avatar.elec {
+            background: rgba(245, 158, 11, 0.12);
+        }
+
+        .int-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .int-client {
+            font-size: 14px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .int-addr {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .badge-attente {
+            background: rgba(245, 158, 11, 0.12);
+            color: var(--alert);
+        }
+
+        .badge-cours {
+            background: rgba(0, 180, 216, 0.12);
+            color: var(--cyan);
+        }
+
+        .badge-satisfait {
+            background: rgba(46, 204, 113, 0.12);
+            color: var(--mint);
+        }
+
+        .badge-nonsatisfait {
+            background: rgba(239, 68, 68, 0.12);
+            color: var(--danger);
+        }
+
+        /* Kanban */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            min-height: 500px;
+        }
+
+        .kanban-col {
+            background: var(--bg);
+            border-radius: var(--radius);
+            padding: 14px;
+            border: 1px solid var(--border);
+        }
+
+        .kanban-col-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+
+        .kanban-col-title {
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .kanban-count {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1px 9px;
+            font-size: 11px;
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .kanban-ticket {
+            background: white;
+            border-radius: var(--radius-sm);
+            padding: 14px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            cursor: grab;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .kanban-ticket.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .kanban-ticket:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+            border-color: var(--cyan);
+        }
+
+        .ticket-id {
+            font-size: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .ticket-client {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .ticket-type {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 10px;
+        }
+
+        .ticket-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ticket-tech {
+            font-size: 11px;
+            background: var(--bg);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .ticket-prio {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .prio-high {
+            background: var(--danger);
+        }
+
+        .prio-mid {
+            background: var(--alert);
+        }
+
+        .prio-low {
+            background: var(--mint);
+        }
+
+        .ticket-actions {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .kanban-ticket:hover .ticket-actions {
+            opacity: 1;
+        }
+
+        .ticket-action-btn {
+            background: var(--bg);
+            border: none;
+            border-radius: 4px;
+            padding: 2px 6px;
+            cursor: pointer;
+            font-size: 10px;
+        }
+
+        /* Payment Rows */
+        .payment-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            background: var(--bg);
+            border-radius: var(--radius-sm);
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            flex-wrap: wrap;
+        }
+
+        .payment-row.locked {
+            border-left: 3px solid var(--danger);
+        }
+
+        .payment-row.unlocked {
+            border-left: 3px solid var(--mint);
+        }
+
+        .pay-icon {
+            font-size: 22px;
+        }
+
+        .pay-info {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .pay-client {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .pay-amount {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .pay-status {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 6px;
+        }
+
+        .lock-badge {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .lock-badge.locked {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        .lock-badge.unlocked {
+            background: rgba(46, 204, 113, 0.1);
+            color: var(--mint);
+        }
+
+        .payment-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .unlock-btn {
+            background: var(--mint);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .unlock-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .edit-payment-btn {
+            background: var(--cyan);
+            color: white;
+            border: none;
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 12px;
+            background: var(--bg);
+            font-weight: 600;
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .data-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 4px 10px;
+            font-size: 12px;
+        }
+
+        /* Search Box */
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .search-box:focus-within {
+            border-color: var(--cyan);
+        }
+
+        .search-box input {
+            border: none;
+            background: none;
+            outline: none;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 13px;
+            flex: 1;
+            color: var(--text);
+        }
+
+        /* Client List Items */
+        .client-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+
+        .client-list-item:hover,
+        .client-list-item.selected {
+            background: var(--bg);
+        }
+
+        .client-list-item.selected {
+            border: 1px solid var(--cyan);
+            background: rgba(0, 180, 216, 0.05);
+        }
+
+        .client-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--navy), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        .client-name {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .client-phone {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .client-detail-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 22px;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+
+        .client-detail-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--navy), var(--blue));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .client-detail-name {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .client-detail-info {
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .history-item {
+            display: flex;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-top: 4px;
+            flex-shrink: 0;
+        }
+
+        .history-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .history-detail {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Modals */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+            animation: fadeIn 0.2s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 560px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            animation: modalIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes modalIn {
+            from {
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 24px 16px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: var(--bg);
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.2s;
+        }
+
+        .modal-close:hover {
+            background: var(--border);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 20px;
+            display: flex;
+            gap: 10px;
+            border-top: 1px solid var(--border);
+            position: sticky;
+            bottom: 0;
+            background: white;
+        }
+
+        /* Form Elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: var(--text);
+            background: var(--bg);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            border-color: var(--cyan);
+            background: white;
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .location-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .location-link {
+            color: var(--cyan);
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .location-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: var(--night);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 24px;
+            font-size: 13px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes toastOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+
+            .kanban-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .data-table {
+                font-size: 12px;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 8px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .modal {
+                max-width: 95%;
+            }
+
+            .payment-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .pay-status {
+                align-items: flex-start;
+                width: 100%;
+            }
+
+            .location-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-logo" onclick="toggleSidebar()">❄️</div>
+            <div class="nav-item active" onclick="showScreen('dashboard', this)">
+                <span class="nav-icon">🏠</span>
+                <span class="nav-label">Tableau de bord</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('kanban', this)">
+                <span class="nav-icon">📋</span>
+                <span class="nav-label">Interventions</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('clients', this)">
+                <span class="nav-icon">🏢</span>
+                <span class="nav-label">Clients</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('finance', this)">
+                <span class="nav-icon">💰</span>
+                <span class="nav-label">Finance</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('crm', this)">
+                <span class="nav-icon">👥</span>
+                <span class="nav-label">CRM</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('gpsmap', this)">
+                <span class="nav-icon">🗺️</span>
+                <span class="nav-label">Carte GPS</span>
+            </div>
+            <div class="nav-item" onclick="showScreen('users', this)">
+                <span class="nav-icon">👤</span>
+                <span class="nav-label">Utilisateurs</span>
+            </div>
+            <div class="sidebar-bottom">
+                <div class="avatar" onclick="logout()">AB</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main">
+            <!-- Topbar -->
+            <div class="topbar">
+                <div>
+                    <div class="topbar-title" id="screenTitle">Tableau de Bord</div>
+                    <div class="topbar-sub" id="screenDate"></div>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" onclick="openModal('newIntervention')">+ Nouvelle demande</button>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content">
+                <!-- Dashboard Screen -->
+                <div class="screen active" id="screen-dashboard">
+                    <div class="kpi-grid">
+                        <div class="kpi-card cyan">
+                            <div class="kpi-icon">🔧</div>
+                            <div class="kpi-val cyan" id="interventionsToday">0</div>
+                            <div class="kpi-label">Interventions du jour</div>
+                        </div>
+                        <div class="kpi-card mint">
+                            <div class="kpi-icon">✅</div>
+                            <div class="kpi-val mint" id="completedToday">0</div>
+                            <div class="kpi-label">Terminées</div>
+                        </div>
+                        <div class="kpi-card coral">
+                            <div class="kpi-icon">⚠️</div>
+                            <div class="kpi-val coral" id="pendingDeposits">0</div>
+                            <div class="kpi-label">Acomptes en attente</div>
+                        </div>
+                        <div class="kpi-card alert">
+                            <div class="kpi-icon">💸</div>
+                            <div class="kpi-val alert" id="totalCollected">0</div>
+                            <div class="kpi-label">MAD encaissés</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Interventions récentes</span>
+                                <button class="btn btn-secondary" onclick="showScreen('kanban', document.querySelectorAll('.nav-item')[1])">Voir tout →</button>
+                            </div>
+                            <div class="card-body" id="recentInterventions"></div>
+                        </div>
+                        <div class="card">
+                            <div class="card-header">
+                                <span class="card-title">Techniciens actifs</span>
+                                <button class="btn btn-secondary" onclick="showScreen('gpsmap', document.querySelectorAll('.nav-item')[5])">Voir carte →</button>
+                            </div>
+                            <div class="card-body" id="activeTechnicians"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kanban Screen -->
+                <div class="screen" id="screen-kanban">
+                    <div class="kanban-board" id="kanbanBoard"></div>
+                </div>
+
+                <!-- Clients Screen -->
+                <div class="screen" id="screen-clients">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">🏢 Gestion des clients</span>
+                            <button class="btn btn-primary" onclick="openClientModal()">+ Nouveau client</button>
+                        </div>
+                        <div class="card-body">
+                            <div class="search-box">
+                                <span>🔍</span>
+                                <input type="text" id="clientSearch" placeholder="Rechercher un client..." oninput="filterClientsList()">
+                            </div>
+                            <div id="clientsList"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Finance Screen -->
+                <div class="screen" id="screen-finance">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">💰 Validation des acomptes (70%)</span>
+                            <button class="btn btn-secondary" onclick="generateDevis()">📄 Générer un devis</button>
+                        </div>
+                        <div class="card-body" id="paymentList"></div>
+                    </div>
+                </div>
+
+                <!-- CRM Screen -->
+                <div class="screen" id="screen-crm">
+                    <div class="grid-2">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="search-box">
+                                    <span>🔍</span>
+                                    <input type="text" id="crmSearch" placeholder="Rechercher client..." oninput="filterCrmClients()">
+                                </div>
+                                <div id="crmClientList"></div>
+                            </div>
+                        </div>
+                        <div class="card" id="clientDetail">
+                            <div class="client-detail-header">
+                                <div class="client-detail-avatar">👤</div>
+                                <div>
+                                    <div class="client-detail-name">Sélectionnez un client</div>
+                                    <div class="client-detail-info">Cliquez sur un client pour voir son historique</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- GPS Map Screen -->
+                <div class="screen" id="screen-gpsmap">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">📍 Suivi GPS en temps réel</span>
+                            <button class="btn btn-secondary" onclick="refreshMap()">🔄 Actualiser</button>
+                        </div>
+                        <div class="card-body">
+                            <div id="map" style="min-height: 400px;"></div>
+                            <div id="mapLegend" style="margin-top: 15px; display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+                                <div><span style="display:inline-block; width:12px; height:12px; background:#2ECC71; border-radius:50%;"></span> Disponible</div>
+                                <div><span style="display:inline-block; width:12px; height:12px; background:#EF4444; border-radius:50%;"></span> En mission</div>
+                                <div><span style="display:inline-block; width:12px; height:12px; background:#F59E0B; border-radius:50%;"></span> En transit</div>
+                                <div><span style="display:inline-block; width:12px; height:12px; background:#00B4D8; border-radius:50%;"></span> Client</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Screen -->
+                <div class="screen" id="screen-users">
+                    <div class="card">
+                        <div class="card-header">
+                            <span class="card-title">👥 Gestion des utilisateurs</span>
+                            <button class="btn btn-primary" onclick="openUserModal()">+ Nouvel utilisateur</button>
+                        </div>
+                        <div class="card-body">
+                            <div id="usersList"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Intervention Modal -->
+    <div class="modal-overlay" id="modal-newIntervention">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">➕ Nouvelle intervention</span>
+                <button class="modal-close" onclick="closeModal('newIntervention')">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Client *</label>
+                    <select class="form-select" id="interventionClient" required>
+                        <option value="">-- Sélectionner un client --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type d'intervention *</label>
+                    <select class="form-select" id="interventionType" required>
+                        <option value="">-- Sélectionner --</option>
+                        <option value="❄️ Montage climatiseur">❄️ Montage climatiseur</option>
+                        <option value="🔧 Réparation climatiseur">🔧 Réparation climatiseur</option>
+                        <option value="🛠️ Maintenance préventive">🛠️ Maintenance préventive</option>
+                        <option value="🚿 Plomberie">🚿 Plomberie</option>
+                        <option value="⚡ Électricité">⚡ Électricité</option>
+                        <option value="🔍 Diagnostic">🔍 Diagnostic</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="interventionDescription" rows="3" placeholder="Détails de l'intervention..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Adresse</label>
+                    <input type="text" class="form-input" id="interventionAddress" placeholder="Adresse complète">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Montant total (MAD)</label>
+                    <input type="number" class="form-input" id="interventionAmount" placeholder="0.00" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Acompte reçu (MAD)</label>
+                    <input type="number" class="form-input" id="interventionDeposit" placeholder="0.00" step="0.01">
+                    <small style="color: var(--muted); font-size: 11px;">L'acompte recommandé est de 70% du montant total</small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priorité</label>
+                    <select class="form-select" id="interventionPriority">
+                        <option value="low">🟢 Basse</option>
+                        <option value="medium" selected>🟡 Moyenne</option>
+                        <option value="high">🔴 Haute</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Technicien assigné</label>
+                    <select class="form-select" id="interventionTechnician">
+                        <option value="">-- Non assigné --</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Date d'intervention</label>
+                    <input type="datetime-local" class="form-input" id="interventionDate">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('newIntervention')">Annuler</button>
+                <button class="btn btn-primary" onclick="createIntervention()">✓ Créer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Intervention Modal -->
+    <div class="modal-overlay" id="modal-editIntervention">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">✏️ Modifier l'intervention</span>
+                <button class="modal-close" onclick="closeModal('editIntervention')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editInterventionId">
+                <div class="form-group">
+                    <label class="form-label">Client</label>
+                    <input type="text" class="form-input" id="editClientName" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Référence</label>
+                    <input type="text" class="form-input" id="editReference" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <input type="text" class="form-input" id="editType" readonly disabled>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Montant total (MAD)</label>
+                    <input type="number" class="form-input" id="editAmount" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Acompte reçu (MAD)</label>
+                    <input type="number" class="form-input" id="editDeposit" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Statut</label>
+                    <select class="form-select" id="editStatus">
+                        <option value="pending">⏳ En attente</option>
+                        <option value="in_progress">🔧 En cours</option>
+                        <option value="completed">✅ Terminé</option>
+                        <option value="unsatisfied">❌ Non satisfait</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Priorité</label>
+                    <select class="form-select" id="editPriority">
+                        <option value="low">🟢 Basse</option>
+                        <option value="medium">🟡 Moyenne</option>
+                        <option value="high">🔴 Haute</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Technicien</label>
+                    <select class="form-select" id="editTechnician"></select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('editIntervention')">Annuler</button>
+                <button class="btn btn-danger" onclick="deleteInterventionFromEdit()">🗑️ Supprimer</button>
+                <button class="btn btn-primary" onclick="saveInterventionChanges()">💾 Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Client Modal with GPS Location -->
+    <div class="modal-overlay" id="modal-client">
+        <div class="modal" style="max-width: 600px;">
+            <div class="modal-header">
+                <span class="modal-title" id="clientModalTitle">➕ Nouveau client</span>
+                <button class="modal-close" onclick="closeModal('client')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="clientId">
+                <div class="form-group">
+                    <label class="form-label">Nom / Raison sociale *</label>
+                    <input type="text" class="form-input" id="clientName" placeholder="Nom du client" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Personne de contact</label>
+                    <input type="text" class="form-input" id="clientContact" placeholder="Nom du contact">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Téléphone</label>
+                    <input type="tel" class="form-input" id="clientPhone" placeholder="+212 6XX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email</label>
+                    <input type="email" class="form-input" id="clientEmail" placeholder="client@example.com">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Adresse</label>
+                    <input type="text" class="form-input" id="clientAddress" placeholder="Adresse complète">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ville</label>
+                    <input type="text" class="form-input" id="clientCity" placeholder="Ville" value="Marrakech">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">📍 Coordonnées GPS (Optionnel)</label>
+                    <div class="location-row">
+                        <div>
+                            <label style="font-size: 11px; color: var(--muted);">Latitude</label>
+                            <input type="number" step="any" class="form-input" id="clientLat" placeholder="31.6295">
+                        </div>
+                        <div>
+                            <label style="font-size: 11px; color: var(--muted);">Longitude</label>
+                            <input type="number" step="any" class="form-input" id="clientLng" placeholder="-7.9811">
+                        </div>
+                    </div>
+                    <small style="color: var(--muted); font-size: 11px;">
+                        <a href="#" class="location-link" onclick="getCurrentLocationForClient(); return false;">📱 Utiliser ma position actuelle</a>
+                    </small>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Notes</label>
+                    <textarea class="form-textarea" id="clientNotes" rows="3" placeholder="Informations complémentaires..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('client')">Annuler</button>
+                <button class="btn btn-primary" onclick="saveClient()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Client Confirmation Modal -->
+    <div class="modal-overlay" id="modal-delete-client">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">⚠️ Confirmer la suppression</span>
+                <button class="modal-close" onclick="closeModal('delete-client')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce client ?</p>
+                <p style="color: var(--danger); font-size: 13px; margin-top: 10px;">Cette action est irréversible.</p>
+                <input type="hidden" id="deleteClientId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('delete-client')">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmDeleteClient()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Intervention Confirmation Modal -->
+    <div class="modal-overlay" id="modal-delete-intervention">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title">⚠️ Confirmer la suppression</span>
+                <button class="modal-close" onclick="closeModal('delete-intervention')">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette intervention ?</p>
+                <p style="color: var(--danger); font-size: 13px; margin-top: 10px;">Cette action est irréversible.</p>
+                <input type="hidden" id="deleteInterventionId">
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('delete-intervention')">Annuler</button>
+                <button class="btn btn-danger" onclick="confirmDeleteIntervention()">Supprimer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div class="modal-overlay" id="modal-user">
+        <div class="modal">
+            <div class="modal-header">
+                <span class="modal-title" id="userModalTitle">➕ Nouvel utilisateur</span>
+                <button class="modal-close" onclick="closeModal('user')">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="userId">
+                <div class="form-group">
+                    <label class="form-label">Nom d'utilisateur *</label>
+                    <input type="text" class="form-input" id="userUsername" placeholder="Nom d'utilisateur" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Nom complet *</label>
+                    <input type="text" class="form-input" id="userFullName" placeholder="Nom complet" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Email *</label>
+                    <input type="email" class="form-input" id="userEmail" placeholder="email@exemple.com" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Téléphone</label>
+                    <input type="tel" class="form-input" id="userPhone" placeholder="+212 6XX XXX XXX">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Rôle</label>
+                    <select class="form-select" id="userRole">
+                        <option value="technician">🔧 Technicien</option>
+                        <option value="manager">👔 Gérant</option>
+                    </select>
+                </div>
+                <div class="form-group" id="passwordGroup">
+                    <label class="form-label">Mot de passe</label>
+                    <input type="password" class="form-input" id="userPassword" placeholder="••••••">
+                    <small style="color: var(--muted); font-size: 11px;">Laisser vide pour garder le mot de passe actuel</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('user')">Annuler</button>
+                <button class="btn btn-primary" onclick="saveUser()">Enregistrer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // ==================== UTILITY FUNCTIONS ====================
+
+        function showToast(msg, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3100);
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('expanded');
+        }
+
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('screenDate').textContent = now.toLocaleDateString('fr-FR', options) + ' — Marrakech';
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return 'Non planifiée';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR');
+        }
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('fr-MA', { style: 'currency', currency: 'MAD' }).format(amount);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function getInitials(name) {
+            if (!name) return '?';
+            return name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        }
+
+        // ==================== CLIENT GPS LOCATION ====================
+
+        function getCurrentLocationForClient() {
+            if (navigator.geolocation) {
+                showToast('📍 Recherche de votre position...');
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('clientLat').value = position.coords.latitude.toFixed(6);
+                        document.getElementById('clientLng').value = position.coords.longitude.toFixed(6);
+                        showToast('✅ Coordonnées GPS ajoutées');
+                    },
+                    (error) => {
+                        let errorMsg = 'Impossible d\'obtenir la position';
+                        if (error.code === 1) errorMsg = 'Veuillez autoriser la géolocalisation';
+                        if (error.code === 2) errorMsg = 'Position non disponible';
+                        if (error.code === 3) errorMsg = 'Délai dépassé';
+                        showToast('❌ ' + errorMsg, 'error');
+                    }
+                );
+            } else {
+                showToast('⚠️ Géolocalisation non supportée par votre navigateur', 'error');
+            }
+        }
+
+        // ==================== DEVIS GENERATION ====================
+
+        function generateDevis() {
+            fetch('/api/interventions')
+                .then(res => res.json())
+                .then(interventions => {
+                    const pendingInterventions = interventions.filter(i => i.payment_status === 'locked');
+
+                    if (pendingInterventions.length === 0) {
+                        showToast('Aucune intervention en attente de paiement', 'info');
+                        return;
+                    }
+
+                    let devisHtml = `
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <meta charset="UTF-8">
+                            <title>Devis Laachir-Tech</title>
+                            <style>
+                                body { font-family: Arial, sans-serif; padding: 40px; }
+                                .header { text-align: center; margin-bottom: 30px; }
+                                .company { font-size: 24px; font-weight: bold; color: #0D1B2A; }
+                                .title { font-size: 18px; color: #00B4D8; margin-top: 5px; }
+                                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                                th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                                th { background: #0D1B2A; color: white; }
+                                .total { margin-top: 20px; text-align: right; font-size: 18px; font-weight: bold; }
+                                .footer { margin-top: 50px; text-align: center; font-size: 12px; color: #666; }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="header">
+                                <div class="company">❄️ LAACHIR-TECH MAINTENANCE</div>
+                                <div class="title">Devis d'intervention technique</div>
+                                <div>123, Avenue Mohammed VI, Guéliz, Marrakech</div>
+                                <div>Tél: +212 524 00 00 00 | Email: contact@laachir-tech.ma</div>
+                            </div>
+                            <h3>Devis N°: DEV-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}</h3>
+                            <p>Date: ${new Date().toLocaleDateString('fr-FR')}</p>
+                            <table>
+                                <thead>
+                                    <tr><th>Référence</th><th>Client</th><th>Type</th><th>Montant Total</th><th>Acompte 70%</th><th>Statut</th></tr>
+                                </thead>
+                                <tbody>
+                                    ${pendingInterventions.map(i => `
+                                        <tr>
+                                            <td>${i.reference}</td>
+                                            <td>${escapeHtml(i.client_name)}</td>
+                                            <td>${i.type}</td>
+                                            <td>${formatCurrency(i.amount)}</td>
+                                            <td>${formatCurrency(i.amount * 0.7)}</td>
+                                            <td><span style="color: #F59E0B;">En attente</span></td>
+                                        </tr>
+                                    `).join('')}
+                                </tbody>
+                            </table>
+                            <div class="total">
+                                Total à encaisser: ${formatCurrency(pendingInterventions.reduce((sum, i) => sum + (i.amount * 0.7), 0))}
+                            </div>
+                            <div class="footer">
+                                <p>Merci de votre confiance. Règlement à réception d'acompte de 70%.</p>
+                                <p>Laachir-Tech Maintenance - RC: 123456 | Patente: 78901234 | ICE: 001234567890123</p>
+                            </div>
+                        </body>
+                        </html>
+                    `;
+
+                    const win = window.open();
+                    win.document.write(devisHtml);
+                    win.document.close();
+                    win.print();
+                    showToast('📄 Devis généré avec succès');
+                })
+                .catch(err => {
+                    console.error(err);
+                    showToast('Erreur lors de la génération du devis', 'error');
+                });
+        }
+
+        // ==================== INTERVENTION MANAGEMENT ====================
+
+        async function updateInterventionStatus(interventionId, newStatus) {
+            try {
+                const response = await fetch(`/api/intervention/${interventionId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: newStatus })
+                });
+
+                if (response.ok) {
+                    showToast(`Statut mis à jour: ${getStatusText(newStatus)}`);
+                    loadKanbanData();
+                    loadDashboardData();
+                    loadFinanceData();
+                } else {
+                    showToast('Erreur lors de la mise à jour', 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        async function deleteIntervention(interventionId) {
+            try {
+                const response = await fetch(`/api/intervention/${interventionId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('Intervention supprimée');
+                    loadKanbanData();
+                    loadDashboardData();
+                    loadFinanceData();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Suppression impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        function openEditInterventionModal(interventionId, clientName, reference, type, amount, deposit, status, priority, technicianId) {
+            document.getElementById('editInterventionId').value = interventionId;
+            document.getElementById('editClientName').value = clientName;
+            document.getElementById('editReference').value = reference;
+            document.getElementById('editType').value = type;
+            document.getElementById('editAmount').value = amount;
+            document.getElementById('editDeposit').value = deposit;
+            document.getElementById('editStatus').value = status;
+            document.getElementById('editPriority').value = priority;
+
+            fetch('/api/technicians')
+                .then(res => res.json())
+                .then(techs => {
+                    const select = document.getElementById('editTechnician');
+                    select.innerHTML = '<option value="">-- Non assigné --</option>' +
+                        techs.map(t => `<option value="${t.id}" ${t.id == technicianId ? 'selected' : ''}>${escapeHtml(t.full_name)}</option>`).join('');
+                });
+
+            openModal('editIntervention');
+        }
+
+        async function saveInterventionChanges() {
+            const id = document.getElementById('editInterventionId').value;
+            const amount = parseFloat(document.getElementById('editAmount').value) || 0;
+            const deposit = parseFloat(document.getElementById('editDeposit').value) || 0;
+            const status = document.getElementById('editStatus').value;
+            const priority = document.getElementById('editPriority').value;
+            const technicianId = document.getElementById('editTechnician').value || null;
+
+            try {
+                await fetch(`/api/intervention/${id}/financial`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ amount: amount, deposit_received: deposit })
+                });
+
+                await fetch(`/api/intervention/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: status })
+                });
+
+                await fetch(`/api/intervention/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ priority: priority, technician_id: technicianId })
+                });
+
+                closeModal('editIntervention');
+                showToast('Intervention mise à jour');
+                loadKanbanData();
+                loadDashboardData();
+                loadFinanceData();
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors de la mise à jour', 'error');
+            }
+        }
+
+        function deleteInterventionFromEdit() {
+            const id = document.getElementById('editInterventionId').value;
+            closeModal('editIntervention');
+            document.getElementById('deleteInterventionId').value = id;
+            openModal('delete-intervention');
+        }
+
+        async function confirmDeleteIntervention() {
+            const id = document.getElementById('deleteInterventionId').value;
+            await deleteIntervention(id);
+            closeModal('delete-intervention');
+        }
+
+        // ==================== NAVIGATION ====================
+
+        const screenTitles = {
+            dashboard: 'Tableau de Bord',
+            kanban: 'Gestion des Interventions',
+            clients: 'Gestion des Clients',
+            finance: 'Validation Financière',
+            crm: 'Historique Clients (CRM)',
+            gpsmap: 'Carte GPS - Suivi des équipes',
+            users: 'Gestion des Utilisateurs'
+        };
+
+        function showScreen(name, el) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById('screen-' + name).classList.add('active');
+            el.classList.add('active');
+            document.getElementById('screenTitle').textContent = screenTitles[name] || name;
+
+            if (name === 'dashboard') loadDashboardData();
+            else if (name === 'kanban') loadKanbanData();
+            else if (name === 'clients') loadClients();
+            else if (name === 'finance') loadFinanceData();
+            else if (name === 'crm') loadCrmClients();
+            else if (name === 'gpsmap') loadMapData();
+            else if (name === 'users') loadUsers();
+        }
+
+        // ==================== DASHBOARD ====================
+
+        async function loadDashboardData() {
+            try {
+                const response = await fetch('/api/kpi-data');
+                const data = await response.json();
+                document.getElementById('interventionsToday').textContent = data.interventions_today;
+                document.getElementById('completedToday').textContent = data.completed_today;
+                document.getElementById('pendingDeposits').textContent = data.pending_deposits;
+                document.getElementById('totalCollected').textContent = data.total_collected;
+
+                const interventionsRes = await fetch('/api/interventions');
+                const interventions = await interventionsRes.json();
+                const recentHtml = interventions.slice(0, 5).map(i => `
+                    <div class="intervention-row" onclick="openEditInterventionModal(${i.id}, '${escapeHtml(i.client_name)}', '${i.reference}', '${i.type}', ${i.amount}, ${i.amount * 0.7}, '${i.status}', '${i.priority}', ${i.technician_id || null})">
+                        <div class="int-avatar ${getTypeIcon(i.type)}">${getTypeEmoji(i.type)}</div>
+                        <div class="int-info">
+                            <div class="int-client">${escapeHtml(i.client_name)}</div>
+                            <div class="int-addr">${escapeHtml(i.address) || 'Adresse non spécifiée'}</div>
+                        </div>
+                        <span class="badge ${getStatusBadgeClass(i.status)}">${getStatusText(i.status)}</span>
+                    </div>
+                `).join('');
+                document.getElementById('recentInterventions').innerHTML = recentHtml || '<div class="loading">Aucune intervention</div>';
+
+                const techRes = await fetch('/api/technicians');
+                const techs = await techRes.json();
+                const techHtml = techs.map(t => `
+                    <div class="intervention-row">
+                        <div class="int-avatar" style="background:rgba(46,204,113,0.15)">👷</div>
+                        <div class="int-info">
+                            <div class="int-client">${escapeHtml(t.full_name)}</div>
+                            <div class="int-addr">${t.status === 'available' ? 'Disponible' : 'En intervention'}</div>
+                        </div>
+                        <span class="badge ${t.status === 'available' ? 'badge-satisfait' : 'badge-cours'}">${t.status === 'available' ? 'Libre' : 'Actif'}</span>
+                    </div>
+                `).join('');
+                document.getElementById('activeTechnicians').innerHTML = techHtml || '<div class="loading">Aucun technicien</div>';
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement données', 'error');
+            }
+        }
+
+        // ==================== INTERVENTIONS (KANBAN) ====================
+
+        async function loadKanbanData() {
+            try {
+                const response = await fetch('/api/interventions');
+                const interventions = await response.json();
+
+                const pending = interventions.filter(i => i.status === 'pending');
+                const inProgress = interventions.filter(i => i.status === 'in_progress');
+                const completed = interventions.filter(i => i.status === 'completed');
+                const unsatisfied = interventions.filter(i => i.status === 'unsatisfied');
+
+                const kanbanHtml = `
+                    <div class="kanban-col" data-status="pending">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title" style="color:var(--alert)">⏳ En attente</span>
+                            <span class="kanban-count">${pending.length}</span>
+                        </div>
+                        <div class="kanban-tickets">
+                            ${pending.map(i => renderKanbanTicket(i)).join('')}
+                        </div>
+                    </div>
+                    <div class="kanban-col" data-status="in_progress">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title" style="color:var(--cyan)">🔧 En cours</span>
+                            <span class="kanban-count">${inProgress.length}</span>
+                        </div>
+                        <div class="kanban-tickets">
+                            ${inProgress.map(i => renderKanbanTicket(i)).join('')}
+                        </div>
+                    </div>
+                    <div class="kanban-col" data-status="completed">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title" style="color:var(--mint)">✅ Terminé</span>
+                            <span class="kanban-count">${completed.length}</span>
+                        </div>
+                        <div class="kanban-tickets">
+                            ${completed.map(i => renderKanbanTicket(i)).join('')}
+                        </div>
+                    </div>
+                    <div class="kanban-col" data-status="unsatisfied">
+                        <div class="kanban-col-header">
+                            <span class="kanban-col-title" style="color:var(--danger)">❌ Non satisfait</span>
+                            <span class="kanban-count">${unsatisfied.length}</span>
+                        </div>
+                        <div class="kanban-tickets">
+                            ${unsatisfied.map(i => renderKanbanTicket(i)).join('')}
+                        </div>
+                    </div>
+                `;
+                document.getElementById('kanbanBoard').innerHTML = kanbanHtml;
+                initDragAndDrop();
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement interventions', 'error');
+            }
+        }
+
+        function renderKanbanTicket(intervention) {
+            const priorityClass = intervention.priority === 'high' ? 'prio-high' :
+                                 intervention.priority === 'medium' ? 'prio-mid' : 'prio-low';
+            const priorityText = intervention.priority === 'high' ? 'Haute' : intervention.priority === 'medium' ? 'Moyenne' : 'Basse';
+
+            return `
+                <div class="kanban-ticket" draggable="true" data-id="${intervention.id}" data-status="${intervention.status}">
+                    <div class="ticket-actions">
+                        <button class="ticket-action-btn" onclick="event.stopPropagation(); openEditInterventionModal(${intervention.id}, '${escapeHtml(intervention.client_name)}', '${intervention.reference}', '${intervention.type}', ${intervention.amount}, ${intervention.amount * 0.7}, '${intervention.status}', '${intervention.priority}', ${intervention.technician_id || null})">✏️</button>
+                    </div>
+                    <div class="ticket-id">${intervention.reference}</div>
+                    <div class="ticket-client">${escapeHtml(intervention.client_name)}</div>
+                    <div class="ticket-type">${intervention.type}</div>
+                    <div class="ticket-footer">
+                        <span class="ticket-tech">${escapeHtml(intervention.technician) || 'Non assigné'}</span>
+                        <span class="ticket-prio ${priorityClass}" title="Priorité ${priorityText}"></span>
+                    </div>
+                </div>
+            `;
+        }
+
+        function initDragAndDrop() {
+            const tickets = document.querySelectorAll('.kanban-ticket');
+            const columns = document.querySelectorAll('.kanban-col');
+
+            tickets.forEach(ticket => {
+                ticket.addEventListener('dragstart', handleDragStart);
+                ticket.addEventListener('dragend', handleDragEnd);
+            });
+
+            columns.forEach(column => {
+                column.addEventListener('dragover', handleDragOver);
+                column.addEventListener('drop', handleDrop);
+            });
+        }
+
+        let draggedItem = null;
+
+        function handleDragStart(e) {
+            draggedItem = this;
+            e.dataTransfer.setData('text/plain', this.dataset.id);
+            this.classList.add('dragging');
+        }
+
+        function handleDragEnd(e) {
+            if (draggedItem) draggedItem.classList.remove('dragging');
+            draggedItem = null;
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        async function handleDrop(e) {
+            e.preventDefault();
+            const column = this.closest('.kanban-col');
+            const newStatus = column.dataset.status;
+            const interventionId = e.dataTransfer.getData('text/plain');
+
+            if (draggedItem && draggedItem.dataset.status !== newStatus) {
+                await updateInterventionStatus(interventionId, newStatus);
+            }
+        }
+
+        async function loadSelectData() {
+            try {
+                const [clientsRes, techsRes] = await Promise.all([
+                    fetch('/api/clients'),
+                    fetch('/api/technicians')
+                ]);
+                const clients = await clientsRes.json();
+                const techs = await techsRes.json();
+
+                document.getElementById('interventionClient').innerHTML = '<option value="">-- Sélectionner un client --</option>' +
+                    clients.map(c => `<option value="${c.id}">${escapeHtml(c.name)}${c.phone ? ' - ' + c.phone : ''}</option>`).join('');
+                document.getElementById('interventionTechnician').innerHTML = '<option value="">-- Non assigné --</option>' +
+                    techs.map(t => `<option value="${t.id}">${escapeHtml(t.full_name)}${t.status === 'available' ? ' (Disponible)' : ' (En mission)'}</option>`).join('');
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        async function createIntervention() {
+            const clientId = document.getElementById('interventionClient').value;
+            const type = document.getElementById('interventionType').value;
+
+            if (!clientId) { showToast('Veuillez sélectionner un client', 'error'); return; }
+            if (!type) { showToast('Veuillez sélectionner un type', 'error'); return; }
+
+            const amount = parseFloat(document.getElementById('interventionAmount').value) || 0;
+            const deposit = parseFloat(document.getElementById('interventionDeposit').value) || (amount * 0.7);
+
+            const data = {
+                client_id: parseInt(clientId),
+                type: type,
+                description: document.getElementById('interventionDescription').value,
+                address: document.getElementById('interventionAddress').value,
+                amount: amount,
+                deposit_received: deposit,
+                priority: document.getElementById('interventionPriority').value,
+                technician_id: document.getElementById('interventionTechnician').value ? parseInt(document.getElementById('interventionTechnician').value) : null,
+                scheduled_date: document.getElementById('interventionDate').value ? new Date(document.getElementById('interventionDate').value).toISOString() : new Date().toISOString()
+            };
+
+            try {
+                const response = await fetch('/api/intervention', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    closeModal('newIntervention');
+                    showToast('✅ Intervention créée');
+                    document.getElementById('interventionDescription').value = '';
+                    document.getElementById('interventionAddress').value = '';
+                    document.getElementById('interventionAmount').value = '';
+                    document.getElementById('interventionDeposit').value = '';
+                    document.getElementById('interventionDate').value = '';
+                    loadDashboardData();
+                    loadKanbanData();
+                    loadFinanceData();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Création impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors de la création', 'error');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const amountInput = document.getElementById('interventionAmount');
+            const depositInput = document.getElementById('interventionDeposit');
+            if (amountInput && depositInput) {
+                amountInput.addEventListener('input', () => {
+                    const amount = parseFloat(amountInput.value) || 0;
+                    depositInput.value = (amount * 0.7).toFixed(2);
+                });
+            }
+        });
+
+        // ==================== FINANCE ====================
+
+        async function loadFinanceData() {
+            try {
+                const response = await fetch('/api/interventions');
+                const interventions = await response.json();
+                const locked = interventions.filter(i => i.payment_status === 'locked' && i.status !== 'completed');
+
+                if (locked.length === 0) {
+                    document.getElementById('paymentList').innerHTML = '<div class="payment-row unlocked">✅ Tous les paiements sont à jour</div>';
+                    return;
+                }
+
+                const paymentHtml = locked.map(p => `
+                    <div class="payment-row locked" id="pay-${p.id}">
+                        <div class="pay-icon">🔒</div>
+                        <div class="pay-info">
+                            <div class="pay-client">${escapeHtml(p.client_name)}</div>
+                            <div class="pay-amount">${p.reference} · ${p.type}</div>
+                            <div class="pay-amount">Montant total: ${formatCurrency(p.amount)} | Acompte requis: ${formatCurrency(p.amount * 0.7)}</div>
+                        </div>
+                        <div class="pay-status">
+                            <span class="lock-badge locked">🔒 Bloquée</span>
+                            <div class="payment-actions">
+                                <button class="edit-payment-btn" onclick="openEditInterventionModal(${p.id}, '${escapeHtml(p.client_name)}', '${p.reference}', '${p.type}', ${p.amount}, ${p.amount * 0.7}, '${p.status}', '${p.priority}', ${p.technician_id || null})">✏️ Modifier</button>
+                                <button class="unlock-btn" onclick="unlockPayment(${p.id}, this)">✓ Valider acompte</button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                document.getElementById('paymentList').innerHTML = paymentHtml;
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement paiements', 'error');
+            }
+        }
+
+        async function unlockPayment(interventionId, btn) {
+            try {
+                const response = await fetch(`/api/intervention/${interventionId}/payment`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                if (response.ok) {
+                    const row = document.getElementById(`pay-${interventionId}`);
+                    if (row) row.remove();
+                    showToast('✅ Acompte validé — Intervention débloquée');
+                    loadDashboardData();
+                    loadFinanceData();
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors du déblocage', 'error');
+            }
+        }
+
+        // ==================== CLIENT MANAGEMENT ====================
+
+        let allClients = [];
+
+        async function loadClients() {
+            try {
+                const response = await fetch('/api/clients');
+                allClients = await response.json();
+                displayClients(allClients);
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement clients', 'error');
+            }
+        }
+
+        function displayClients(clients) {
+            if (clients.length === 0) {
+                document.getElementById('clientsList').innerHTML = '<div class="loading">Aucun client. Cliquez sur "Nouveau client" pour en ajouter.</div>';
+                return;
+            }
+
+            const clientsHtml = `
+                <table class="data-table">
+                    <thead>
+                        <tr><th>Client</th><th>Contact</th><th>Téléphone</th><th>Adresse</th><th>GPS</th><th>Interventions</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody>
+                        ${clients.map(client => `
+                            <tr>
+                                <td><strong>${escapeHtml(client.name)}</strong><br><small style="color:var(--muted)">${escapeHtml(client.email) || ''}</small></td>
+                                <td>${escapeHtml(client.contact_person) || '-'}</td>
+                                <td>${escapeHtml(client.phone) || '-'}</td>
+                                <td>${escapeHtml(client.address) || '-'}<br><small>${escapeHtml(client.city) || ''}</small></td>
+                                <td>${client.lat && client.lng ? '📍 Oui' : '❌ Non'}</td>
+                                <td><span class="badge badge-cours">${client.interventions ? client.interventions.length : 0}</span></td>
+                                <td><div class="action-btns">
+                                    <button class="btn btn-secondary action-btn" onclick="editClient(${client.id})">✏️</button>
+                                    <button class="btn btn-danger action-btn" onclick="deleteClient(${client.id})">🗑️</button>
+                                </div>
+                                        </div>
+                            </td>
+                        </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            document.getElementById('clientsList').innerHTML = clientsHtml;
+        }
+
+        function filterClientsList() {
+            const searchTerm = document.getElementById('clientSearch').value.toLowerCase();
+            const filtered = allClients.filter(client =>
+                client.name.toLowerCase().includes(searchTerm) ||
+                (client.phone && client.phone.includes(searchTerm)) ||
+                (client.email && client.email.toLowerCase().includes(searchTerm))
+            );
+            displayClients(filtered);
+        }
+
+        function openClientModal(clientId = null) {
+            if (clientId) {
+                editClient(clientId);
+            } else {
+                document.getElementById('clientModalTitle').textContent = '➕ Nouveau client';
+                document.getElementById('clientId').value = '';
+                document.getElementById('clientName').value = '';
+                document.getElementById('clientContact').value = '';
+                document.getElementById('clientPhone').value = '';
+                document.getElementById('clientEmail').value = '';
+                document.getElementById('clientAddress').value = '';
+                document.getElementById('clientCity').value = 'Marrakech';
+                document.getElementById('clientLat').value = '';
+                document.getElementById('clientLng').value = '';
+                document.getElementById('clientNotes').value = '';
+                openModal('client');
+            }
+        }
+
+        async function editClient(clientId) {
+            try {
+                const response = await fetch(`/api/clients/${clientId}`);
+                const client = await response.json();
+
+                document.getElementById('clientModalTitle').textContent = '✏️ Modifier le client';
+                document.getElementById('clientId').value = client.id;
+                document.getElementById('clientName').value = client.name;
+                document.getElementById('clientContact').value = client.contact_person || '';
+                document.getElementById('clientPhone').value = client.phone || '';
+                document.getElementById('clientEmail').value = client.email || '';
+                document.getElementById('clientAddress').value = client.address || '';
+                document.getElementById('clientCity').value = client.city || 'Marrakech';
+                document.getElementById('clientLat').value = client.lat || '';
+                document.getElementById('clientLng').value = client.lng || '';
+                document.getElementById('clientNotes').value = client.notes || '';
+                openModal('client');
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement client', 'error');
+            }
+        }
+
+        async function saveClient() {
+            const clientId = document.getElementById('clientId').value;
+            const clientData = {
+                name: document.getElementById('clientName').value,
+                contact_person: document.getElementById('clientContact').value,
+                phone: document.getElementById('clientPhone').value,
+                email: document.getElementById('clientEmail').value,
+                address: document.getElementById('clientAddress').value,
+                city: document.getElementById('clientCity').value,
+                lat: document.getElementById('clientLat').value ? parseFloat(document.getElementById('clientLat').value) : null,
+                lng: document.getElementById('clientLng').value ? parseFloat(document.getElementById('clientLng').value) : null,
+                notes: document.getElementById('clientNotes').value
+            };
+
+            if (!clientData.name) {
+                showToast('Veuillez saisir le nom du client', 'error');
+                return;
+            }
+
+            try {
+                const url = clientId ? `/api/clients/${clientId}` : '/api/clients';
+                const method = clientId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(clientData)
+                });
+
+                if (response.ok) {
+                    closeModal('client');
+                    showToast(clientId ? '✅ Client modifié' : '✅ Client créé');
+                    loadClients();
+                    loadSelectData();
+                    loadCrmClients();
+                    loadMapData();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Opération impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors de l\'enregistrement', 'error');
+            }
+        }
+
+        function deleteClient(clientId) {
+            document.getElementById('deleteClientId').value = clientId;
+            openModal('delete-client');
+        }
+
+        async function confirmDeleteClient() {
+            const clientId = document.getElementById('deleteClientId').value;
+
+            try {
+                const response = await fetch(`/api/clients/${clientId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    closeModal('delete-client');
+                    showToast('✅ Client supprimé');
+                    loadClients();
+                    loadSelectData();
+                    loadCrmClients();
+                    loadMapData();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Suppression impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors de la suppression', 'error');
+            }
+        }
+
+        // ==================== CRM ====================
+
+        let crmClients = [];
+
+        async function loadCrmClients() {
+            try {
+                const response = await fetch('/api/clients');
+                crmClients = await response.json();
+                displayCrmClients(crmClients);
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement CRM', 'error');
+            }
+        }
+
+        function displayCrmClients(clients) {
+            const clientsHtml = clients.map(client => `
+                <div class="client-list-item" onclick="selectClient(${client.id}, this)">
+                    <div class="client-avatar">${getInitials(client.name)}</div>
+                    <div>
+                        <div class="client-name">${escapeHtml(client.name)}</div>
+                        <div class="client-phone">📞 ${escapeHtml(client.phone) || 'Non renseigné'}</div>
+                        ${client.lat && client.lng ? '<div style="font-size:10px; color:#00B4D8;">📍 Localisé</div>' : ''}
+                    </div>
+                </div>
+            `).join('');
+            document.getElementById('crmClientList').innerHTML = clientsHtml || '<div class="loading">Aucun client</div>';
+        }
+
+        function filterCrmClients() {
+            const searchTerm = document.getElementById('crmSearch').value.toLowerCase();
+            const filtered = crmClients.filter(client =>
+                client.name.toLowerCase().includes(searchTerm) ||
+                (client.phone && client.phone.includes(searchTerm))
+            );
+            displayCrmClients(filtered);
+        }
+
+        async function selectClient(clientId, element) {
+            document.querySelectorAll('#crmClientList .client-list-item').forEach(i => i.classList.remove('selected'));
+            element.classList.add('selected');
+
+            try {
+                const response = await fetch(`/api/clients/${clientId}/history`);
+                const data = await response.json();
+
+                const historyHtml = data.interventions.map(int => `
+                    <div class="history-item">
+                        <div class="history-dot" style="background:${getHistoryStatusColor(int.status)}"></div>
+                        <div>
+                            <div class="history-title">${int.type}</div>
+                            <div class="history-detail">${formatDate(int.date)} · ${int.technician || 'Non assigné'} · ${formatCurrency(int.amount)} · ${getStatusText(int.status)}</div>
+                        </div>
+                    </div>
+                `).join('');
+
+                const gpsInfo = (data.client.lat && data.client.lng) ? `
+                    <div style="margin-top: 10px;">
+                        <small style="color: var(--cyan);">
+                            📍 GPS: ${data.client.lat}, ${data.client.lng}
+                            <a href="#" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${data.client.lat},${data.client.lng}', '_blank'); return false;" style="color: var(--cyan);"> Voir sur la carte</a>
+                        </small>
+                    </div>
+                ` : '';
+
+                const detailHtml = `
+                    <div class="client-detail-header">
+                        <div class="client-detail-avatar">${getInitials(data.client.name)}</div>
+                        <div>
+                            <div class="client-detail-name">${escapeHtml(data.client.name)}</div>
+                            <div class="client-detail-info">📍 ${escapeHtml(data.client.address) || 'Adresse non spécifiée'} · 📞 ${escapeHtml(data.client.phone) || 'Non renseigné'}</div>
+                            ${gpsInfo}
+                        </div>
+                        <button class="btn btn-secondary" onclick="editClient(${clientId})">✏️ Modifier</button>
+                    </div>
+                    <div class="card-body">
+                        <div style="font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px">Historique des interventions (${data.interventions.length})</div>
+                        ${historyHtml || '<div class="loading">Aucune intervention</div>'}
+                    </div>
+                `;
+                document.getElementById('clientDetail').innerHTML = detailHtml;
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement historique', 'error');
+            }
+        }
+
+        // ==================== GPS MAP ====================
+
+        async function loadMapData() {
+            try {
+                const [techRes, clientRes] = await Promise.all([
+                    fetch('/api/map/technicians'),
+                    fetch('/api/map/clients')
+                ]);
+                const technicians = await techRes.json();
+                const clients = await clientRes.json();
+
+                const mapHtml = `
+                    <div style="max-height: 450px; overflow-y: auto;">
+                        <h4>👷 Techniciens en mission</h4>
+                        ${technicians.length === 0 ? '<div class="loading">Aucun technicien localisé</div>' : `
+                        <table class="data-table">
+                            <thead><tr><th>Nom</th><th>Statut</th><th>Position</th><th>Dernière MAJ</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${technicians.map(t => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(t.name)}</strong></td>
+                                        <td><span class="badge ${t.status === 'available' ? 'badge-satisfait' : t.status === 'on_mission' ? 'badge-cours' : 'badge-attente'}">${t.status === 'available' ? 'Disponible' : t.status === 'on_mission' ? 'En mission' : 'En transit'}</span></td>
+                                        <td>${t.lat ? `${t.lat.toFixed(6)}, ${t.lng.toFixed(6)}` : 'Non localisé'}</td>
+                                        <td>${t.updated_at ? new Date(t.updated_at).toLocaleTimeString() : '-'}</td>
+                                        <td>${t.lat ? `<button class="btn btn-secondary action-btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${t.lat},${t.lng}', '_blank')">🗺️ Voir</button>` : '-'}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        `}
+                        <h4 style="margin-top: 20px;">🏢 Clients localisés</h4>
+                        ${clients.length === 0 ? '<div class="loading">Aucun client localisé. Ajoutez des coordonnées GPS lors de la création/modification d\'un client.</div>' : `
+                        <table class="data-table">
+                            <thead><tr><th>Nom</th><th>Adresse</th><th>Téléphone</th><th>Coordonnées</th><th>Action</th></tr></thead>
+                            <tbody>
+                                ${clients.map(c => `
+                                    <tr>
+                                        <td><strong>${escapeHtml(c.name)}</strong></td>
+                                        <td>${escapeHtml(c.address) || '-'}</td>
+                                        <td>${escapeHtml(c.phone) || '-'}</td>
+                                        <td>${c.lat ? `${c.lat.toFixed(6)}, ${c.lng.toFixed(6)}` : 'Non localisé'}</td>
+                                        <td><button class="btn btn-secondary action-btn" onclick="window.open('https://www.google.com/maps/search/?api=1&query=${c.lat},${c.lng}', '_blank')">🗺️ Itinéraire</button></td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        `}
+                    </div>
+                `;
+                document.getElementById('map').innerHTML = mapHtml;
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement carte', 'error');
+            }
+        }
+
+        function refreshMap() {
+            showToast('🔄 Actualisation...');
+            loadMapData();
+        }
+
+        // ==================== USER MANAGEMENT ====================
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                const users = await response.json();
+
+                const usersHtml = `
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>Utilisateur</th><th>Nom</th><th>Rôle</th><th>Téléphone</th><th>Status</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            ${users.map(user => `
+                                <tr>
+                                    <td><strong>${escapeHtml(user.username)}</strong><br><small style="color:var(--muted)">${escapeHtml(user.email)}</small></td>
+                                    <td>${escapeHtml(user.full_name)}</td>
+                                    <td><span class="badge ${user.role === 'manager' ? 'badge-cours' : 'badge-satisfait'}">${user.role === 'manager' ? '👔 Gérant' : '🔧 Technicien'}</span></td>
+                                    <td>${escapeHtml(user.phone) || '-'}</td>
+                                    <td><span class="badge ${user.is_active ? 'badge-satisfait' : 'badge-attente'}">${user.is_active ? 'Actif' : 'Inactif'}</span></td>
+                                    <td><div class="action-btns">
+                                        <button class="btn btn-secondary action-btn" onclick="editUser(${user.id})">✏️</button>
+                                        <button class="btn btn-secondary action-btn" onclick="toggleUserStatus(${user.id}, ${!user.is_active})">${user.is_active ? '🔒' : '🔓'}</button>
+                                        ${user.username !== 'admin' ? `<button class="btn btn-danger action-btn" onclick="deleteUser(${user.id})">🗑️</button>` : ''}
+                                    </div></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+                document.getElementById('usersList').innerHTML = usersHtml || '<div class="loading">Aucun utilisateur</div>';
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement utilisateurs', 'error');
+            }
+        }
+
+        function openUserModal(userId = null) {
+            if (userId) {
+                editUser(userId);
+            } else {
+                document.getElementById('userModalTitle').textContent = '➕ Nouvel utilisateur';
+                document.getElementById('userId').value = '';
+                document.getElementById('userUsername').value = '';
+                document.getElementById('userFullName').value = '';
+                document.getElementById('userEmail').value = '';
+                document.getElementById('userPhone').value = '';
+                document.getElementById('userRole').value = 'technician';
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userPassword').required = true;
+                openModal('user');
+            }
+        }
+
+        async function editUser(userId) {
+            try {
+                const response = await fetch(`/api/users/${userId}`);
+                const user = await response.json();
+
+                document.getElementById('userModalTitle').textContent = '✏️ Modifier l\'utilisateur';
+                document.getElementById('userId').value = user.id;
+                document.getElementById('userUsername').value = user.username;
+                document.getElementById('userFullName').value = user.full_name;
+                document.getElementById('userEmail').value = user.email;
+                document.getElementById('userPhone').value = user.phone || '';
+                document.getElementById('userRole').value = user.role;
+                document.getElementById('userPassword').value = '';
+                document.getElementById('userPassword').required = false;
+                openModal('user');
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement utilisateur', 'error');
+            }
+        }
+
+        async function saveUser() {
+            const userId = document.getElementById('userId').value;
+            const userData = {
+                username: document.getElementById('userUsername').value,
+                full_name: document.getElementById('userFullName').value,
+                email: document.getElementById('userEmail').value,
+                phone: document.getElementById('userPhone').value,
+                role: document.getElementById('userRole').value,
+                password: document.getElementById('userPassword').value
+            };
+
+            if (!userData.username || !userData.full_name || !userData.email) {
+                showToast('Veuillez remplir tous les champs obligatoires', 'error');
+                return;
+            }
+
+            if (!userId && !userData.password) {
+                showToast('Veuillez fournir un mot de passe', 'error');
+                return;
+            }
+
+            try {
+                const url = userId ? `/api/users/${userId}` : '/api/users';
+                const method = userId ? 'PUT' : 'POST';
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                if (response.ok) {
+                    closeModal('user');
+                    showToast(userId ? '✅ Utilisateur modifié' : '✅ Utilisateur créé');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Opération impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur lors de l\'enregistrement', 'error');
+            }
+        }
+
+        function deleteUser(userId) {
+            if (confirm('Supprimer cet utilisateur ?')) {
+                fetch(`/api/users/${userId}`, { method: 'DELETE' })
+                    .then(response => {
+                        if (response.ok) {
+                            showToast('✅ Utilisateur supprimé');
+                            loadUsers();
+                        } else {
+                            showToast('❌ Erreur suppression', 'error');
+                        }
+                    });
+            }
+        }
+
+        async function toggleUserStatus(userId, newStatus) {
+            try {
+                const response = await fetch(`/api/users/${userId}/status`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ is_active: newStatus })
+                });
+
+                if (response.ok) {
+                    showToast(newStatus ? '✅ Utilisateur activé' : '🔒 Utilisateur désactivé');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showToast('Erreur: ' + (error.error || 'Changement impossible'), 'error');
+                }
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur réseau', 'error');
+            }
+        }
+
+        // ==================== HELPER FUNCTIONS ====================
+
+        function getTypeIcon(type) {
+            if (type.includes('Climat') || type.includes('clim')) return 'clim';
+            if (type.includes('Plomberie')) return 'plomb';
+            if (type.includes('Électricité')) return 'elec';
+            return 'clim';
+        }
+
+        function getTypeEmoji(type) {
+            if (type.includes('Climat') || type.includes('clim')) return '❄️';
+            if (type.includes('Plomberie')) return '🚿';
+            if (type.includes('Électricité')) return '⚡';
+            return '🔧';
+        }
+
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'pending': 'badge-attente',
+                'in_progress': 'badge-cours',
+                'completed': 'badge-satisfait',
+                'unsatisfied': 'badge-nonsatisfait'
+            };
+            return classes[status] || 'badge-attente';
+        }
+
+        function getStatusText(status) {
+            const texts = {
+                'pending': 'En attente',
+                'in_progress': 'En cours',
+                'completed': 'Terminé',
+                'unsatisfied': 'Non satisfait'
+            };
+            return texts[status] || status;
+        }
+
+        function getHistoryStatusColor(status) {
+            const colors = {
+                'pending': '#F59E0B',
+                'in_progress': '#00B4D8',
+                'completed': '#2ECC71',
+                'unsatisfied': '#EF4444'
+            };
+            return colors[status] || '#64748B';
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+
+        function openModal(name) {
+            const modal = document.getElementById('modal-' + name);
+            if (modal) {
+                if (name === 'newIntervention') loadSelectData();
+                modal.classList.add('open');
+            }
+        }
+
+        function closeModal(name) {
+            const modal = document.getElementById('modal-' + name);
+            if (modal) modal.classList.remove('open');
+        }
+
+        // ==================== INITIALIZATION ====================
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDateTime();
+            setInterval(updateDateTime, 60000);
+            loadDashboardData();
+
+            // Close modals when clicking outside
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (e) => {
+                    if (e.target === overlay) {
+                        overlay.classList.remove('open');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

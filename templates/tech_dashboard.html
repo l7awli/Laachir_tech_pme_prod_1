@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Laachir-Tech - Technicien</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: #F0F4F8;
+            color: #1B2D4F;
+            overflow-x: hidden;
+            padding-bottom: 70px;
+        }
+
+        /* Header */
+        .tech-header {
+            background: linear-gradient(135deg, #0D1B2A, #1B2D4F);
+            color: white;
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .tech-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .tech-greeting h2 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .tech-greeting p {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .tech-status {
+            background: rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+            background: #2ECC71;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .logout-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* Stats */
+        .tech-stats {
+            display: flex;
+            gap: 12px;
+            padding: 16px 20px;
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .stat-card {
+            flex: 1;
+            background: #F0F4F8;
+            border-radius: 8px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: #00B4D8;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+
+        /* Navigation Tabs */
+        .tech-nav {
+            display: flex;
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 0 20px;
+            gap: 20px;
+            overflow-x: auto;
+        }
+
+        .nav-tab {
+            padding: 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748B;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            white-space: nowrap;
+        }
+
+        .nav-tab.active {
+            color: #00B4D8;
+            border-bottom-color: #00B4D8;
+        }
+
+        /* Content */
+        .tech-content {
+            padding: 20px;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mission Cards */
+        .mission-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 24px rgba(13,27,42,0.1);
+            border: 1px solid #E2E8F0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mission-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 40px rgba(13,27,42,0.16);
+        }
+
+        .mission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .mission-ref {
+            font-family: monospace;
+            font-size: 11px;
+            color: #64748B;
+            background: #F0F4F8;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .mission-status {
+            font-size: 11px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .status-pending {
+            background: rgba(245,158,11,0.1);
+            color: #F59E0B;
+        }
+
+        .status-progress {
+            background: rgba(0,180,216,0.1);
+            color: #00B4D8;
+        }
+
+        .status-completed {
+            background: rgba(46,204,113,0.1);
+            color: #2ECC71;
+        }
+
+        .mission-client {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .mission-type {
+            font-size: 13px;
+            color: #64748B;
+            margin-bottom: 12px;
+        }
+
+        .mission-address {
+            font-size: 12px;
+            color: #1B2D4F;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mission-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn-mission {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-call {
+            background: rgba(46,204,113,0.1);
+            color: #2ECC71;
+        }
+
+        .btn-location {
+            background: rgba(0,180,216,0.1);
+            color: #00B4D8;
+        }
+
+        .btn-start {
+            background: #00B4D8;
+            color: white;
+        }
+
+        /* Report Sections */
+        .report-section {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #E2E8F0;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .photo-box {
+            aspect-ratio: 1;
+            border: 2px dashed #E2E8F0;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #F0F4F8;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .photo-box.has-photo {
+            border-style: solid;
+            border-color: #2ECC71;
+        }
+
+        .photo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .photo-placeholder {
+            text-align: center;
+            color: #64748B;
+        }
+
+        .photo-placeholder span {
+            font-size: 32px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .photo-label {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        /* Parts */
+        .parts-list {
+            margin-bottom: 16px;
+        }
+
+        .part-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #F0F4F8;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .part-name {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .part-qty {
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .btn-add-part {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,180,216,0.1);
+            border: 2px dashed #00B4D8;
+            border-radius: 8px;
+            color: #00B4D8;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 16px;
+        }
+
+        .btn-remove-part {
+            background: rgba(239,68,68,0.1);
+            color: #EF4444;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Notes */
+        .notes-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 16px;
+        }
+
+        /* Signature */
+        .signature-area {
+            border: 2px dashed #E2E8F0;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background: #F0F4F8;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .signature-preview {
+            width: 100%;
+            min-height: 120px;
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #64748B;
+        }
+
+        .signature-preview img {
+            max-width: 100%;
+            max-height: 120px;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #2ECC71, #27ae60);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        /* Location */
+        .location-box {
+            background: #F0F4F8;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .location-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(0,180,216,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .location-details {
+            flex: 1;
+        }
+
+        .location-address {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .location-coords {
+            font-size: 11px;
+            color: #64748B;
+            font-family: monospace;
+        }
+
+        .btn-locate {
+            width: 100%;
+            padding: 12px;
+            background: #00B4D8;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        /* Modals */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 14px;
+            max-width: 90%;
+            width: 400px;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 16px;
+            border-bottom: 1px solid #E2E8F0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        #camera-preview {
+            width: 100%;
+            background: #000;
+            border-radius: 8px;
+        }
+
+        /* Part Selection */
+        .part-list-modal {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .part-select-item {
+            padding: 12px;
+            border-bottom: 1px solid #E2E8F0;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+
+        .part-select-item:hover {
+            background: #F0F4F8;
+        }
+
+        .quantity-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 16px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #0D1B2A;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 600;
+            z-index: 2000;
+            animation: toastIn 0.3s ease, toastOut 0.3s ease 2.7s forwards;
+            white-space: nowrap;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+            to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+
+        @keyframes toastOut {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 20px 20px;
+            border-top: 1px solid #E2E8F0;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+            z-index: 99;
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: #64748B;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .bottom-nav .nav-item.active {
+            color: #00B4D8;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        .nav-label {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #64748B;
+        }
+    </style>
+</head>
+<body>
+    <div class="tech-header">
+        <div class="tech-header-top">
+            <div class="tech-greeting">
+                <h2>Bonjour, <span id="techName">Technicien</span> 👋</h2>
+                <p id="currentDate"></p>
+            </div>
+            <div style="display: flex; gap: 12px;">
+                <div class="tech-status">
+                    <div class="status-dot"></div>
+                    <span>En ligne</span>
+                </div>
+                <button class="logout-btn" onclick="logout()">🚪</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-stats">
+        <div class="stat-card">
+            <div class="stat-value" id="missionsCount">0</div>
+            <div class="stat-label">Missions</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="completedCount">0</div>
+            <div class="stat-label">Terminées</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="pendingCount">0</div>
+            <div class="stat-label">En cours</div>
+        </div>
+    </div>
+
+    <div class="tech-nav">
+        <div class="nav-tab active" onclick="showScreen('missions')">📋 Missions</div>
+        <div class="nav-tab" onclick="showScreen('report')">📝 Rapport</div>
+        <div class="nav-tab" onclick="showScreen('location')">📍 Localisation</div>
+    </div>
+
+    <div class="tech-content">
+        <!-- Missions Screen -->
+        <div class="screen active" id="missionsScreen">
+            <div id="missionsList"></div>
+        </div>
+
+        <!-- Report Screen -->
+        <div class="screen" id="reportScreen">
+            <div id="reportForm"></div>
+        </div>
+
+        <!-- Location Screen -->
+        <div class="screen" id="locationScreen">
+            <div id="locationContent"></div>
+        </div>
+    </div>
+
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('missions')">
+            <div class="nav-icon">📋</div>
+            <div class="nav-label">Missions</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('report')">
+            <div class="nav-icon">📝</div>
+            <div class="nav-label">Rapport</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('location')">
+            <div class="nav-icon">📍</div>
+            <div class="nav-label">Localisation</div>
+        </div>
+    </div>
+
+    <!-- Camera Modal -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📸 Prendre une photo</span>
+                <button onclick="closeCameraModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div class="modal-body">
+                <video id="camera-preview" autoplay playsinline style="width:100%; border-radius:8px;"></video>
+                <canvas id="camera-canvas" style="display:none;"></canvas>
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button class="btn-mission" style="flex:1" onclick="capturePhoto()">📸 Prendre</button>
+                    <button class="btn-mission" style="flex:1" onclick="closeCameraModal()">Annuler</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Part Selection Modal -->
+    <div class="modal" id="partModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔩 Choisir une pièce</span>
+                <button onclick="closePartModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div class="modal-body part-list-modal" id="partListModal"></div>
+        </div>
+    </div>
+
+    <!-- Quantity Modal -->
+    <div class="modal" id="quantityModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔢 Quantité</span>
+                <button onclick="closeQuantityModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div class="modal-body">
+                <input type="number" id="partQuantity" class="quantity-input" value="1" min="1">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-mission" style="flex:1" onclick="closeQuantityModal()">Annuler</button>
+                    <button class="btn-mission btn-start" style="flex:1" onclick="confirmAddPart()">Ajouter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signature Modal -->
+    <div class="modal" id="signatureModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>✍️ Signature client</span>
+                <button onclick="closeSignatureModal()" style="background:none; border:none; font-size:20px; cursor:pointer;">✕</button>
+            </div>
+            <div class="modal-body">
+                <canvas id="signatureCanvas" width="350" height="200" style="border:1px solid #E2E8F0; border-radius:8px; width:100%; cursor: crosshair;"></canvas>
+                <div style="display:flex; gap:10px; margin-top:16px;">
+                    <button class="btn-mission" style="flex:1" onclick="clearSignature()">Effacer</button>
+                    <button class="btn-mission btn-start" style="flex:1" onclick="saveSignature()">Valider</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <script>
+        let currentTechnician = { name: '{{ current_user.full_name }}', id: {{ current_user.id }} };
+        let currentMission = null;
+        let selectedParts = [];
+        let photoBeforeData = null;
+        let photoAfterData = null;
+        let mediaStream = null;
+        let currentPhotoType = null;
+        let signatureData = null;
+        let pendingPart = null;
+
+        function showToast(msg) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = msg;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 3100);
+        }
+
+        function updateDateTime() {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('fr-FR', {
+                weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
+            }).toUpperCase();
+        }
+
+        function logout() {
+            if (confirm('Voulez-vous vraiment vous déconnecter ?')) {
+                window.location.href = '/logout';
+            }
+        }
+
+        function showScreen(screen) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(screen + 'Screen').classList.add('active');
+            if (screen === 'missions') document.querySelectorAll('.nav-tab')[0].classList.add('active');
+            else if (screen === 'report') document.querySelectorAll('.nav-tab')[1].classList.add('active');
+            else if (screen === 'location') document.querySelectorAll('.nav-tab')[2].classList.add('active');
+
+            if (screen === 'missions') loadMissions();
+            else if (screen === 'location') loadLocationContent();
+        }
+
+        function switchTab(tab) {
+            showScreen(tab);
+            document.querySelectorAll('.bottom-nav .nav-item').forEach((item, index) => {
+                if ((tab === 'missions' && index === 0) || (tab === 'report' && index === 1) || (tab === 'location' && index === 2)) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        async function loadMissions() {
+            try {
+                const response = await fetch('/api/technician/missions');
+                const missions = await response.json();
+
+                document.getElementById('techName').textContent = currentTechnician.name;
+                document.getElementById('missionsCount').textContent = missions.length;
+                document.getElementById('completedCount').textContent = missions.filter(m => m.status === 'completed').length;
+                document.getElementById('pendingCount').textContent = missions.filter(m => m.status === 'in_progress').length;
+
+                const missionsHtml = missions.map(mission => `
+                    <div class="mission-card" onclick="selectMission(${mission.id})">
+                        <div class="mission-header">
+                            <span class="mission-ref">${mission.reference}</span>
+                            <span class="mission-status status-${mission.status === 'pending' ? 'pending' : mission.status === 'in_progress' ? 'progress' : 'completed'}">
+                                ${mission.status === 'pending' ? '⏳ En attente' : mission.status === 'in_progress' ? '🔧 En cours' : '✅ Terminé'}
+                            </span>
+                        </div>
+                        <div class="mission-client">${escapeHtml(mission.client_name)}</div>
+                        <div class="mission-type">${mission.type}</div>
+                        <div class="mission-address">📍 ${mission.address || 'Adresse non spécifiée'}</div>
+                        <div class="mission-actions">
+                            <button class="btn-mission btn-call" onclick="event.stopPropagation();callClient('${mission.client_phone}')">📞 Appeler</button>
+                            <button class="btn-mission btn-location" onclick="event.stopPropagation();getCurrentLocationAndUpdate(${mission.id})">📍 Ma position</button>
+                            ${mission.status !== 'completed' ? `
+                                <button class="btn-mission btn-start" onclick="event.stopPropagation();startMission(${mission.id})">
+                                    ${mission.status === 'pending' ? '🚀 Démarrer' : '📝 Rapporter'}
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+
+                document.getElementById('missionsList').innerHTML = missionsHtml || '<div class="loading">Aucune mission</div>';
+            } catch (error) {
+                console.error(error);
+                showToast('Erreur chargement missions');
+            }
+        }
+
+        function selectMission(missionId) {
+            currentMission = missionId;
+            loadReportForm(missionId);
+            showScreen('report');
+            switchTab('report');
+        }
+
+        async function loadReportForm(missionId) {
+            try {
+                const response = await fetch(`/api/intervention/${missionId}`);
+                const mission = await response.json();
+
+                const formHtml = `
+                    <div class="report-section">
+                        <div class="section-title">📸 Photos</div>
+                        <div class="photo-grid">
+                            <div class="photo-box ${photoBeforeData ? 'has-photo' : ''}" id="photoBefore" onclick="openCamera('before')">
+                                ${photoBeforeData ? `<img src="${photoBeforeData}">` : '<div class="photo-placeholder"><span>📷</span><div class="photo-label">AVANT</div></div>'}
+                            </div>
+                            <div class="photo-box ${photoAfterData ? 'has-photo' : ''}" id="photoAfter" onclick="openCamera('after')">
+                                ${photoAfterData ? `<img src="${photoAfterData}">` : '<div class="photo-placeholder"><span>📷</span><div class="photo-label">APRÈS</div></div>'}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-section">
+                        <div class="section-title">🔩 Pièces</div>
+                        <div class="parts-list" id="partsList">${renderPartsList()}</div>
+                        <button class="btn-add-part" onclick="openPartModal()">+ Ajouter</button>
+                    </div>
+                    <div class="report-section">
+                        <div class="section-title">📝 Notes</div>
+                        <textarea class="notes-input" id="reportNotes" rows="4" placeholder="Description des travaux..."></textarea>
+                    </div>
+                    <div class="report-section">
+                        <div class="section-title">✍️ Signature client</div>
+                        <div class="signature-area" onclick="openSignatureModal()">
+                            <div class="signature-preview" id="signaturePreview">
+                                ${signatureData ? `<img src="${signatureData}">` : '<span>✍️ Cliquez pour signer</span>'}
+                            </div>
+                        </div>
+                    </div>
+                    <button class="btn-submit" onclick="submitReport(${missionId})">✅ Soumettre le rapport</button>
+                `;
+                document.getElementById('reportForm').innerHTML = formHtml;
+            } catch (error) {
+                showToast('Erreur formulaire');
+            }
+        }
+
+        function renderPartsList() {
+            if (selectedParts.length === 0) return '<div class="part-item">Aucune pièce</div>';
+            return selectedParts.map((part, index) => `
+                <div class="part-item">
+                    <div><div class="part-name">${part.name}</div><div class="part-qty">x${part.quantity}</div></div>
+                    <button class="btn-remove-part" onclick="removePart(${index})">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function openCamera(type) {
+            currentPhotoType = type;
+            const modal = document.getElementById('cameraModal');
+            modal.classList.add('active');
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    mediaStream = stream;
+                    document.getElementById('camera-preview').srcObject = stream;
+                }).catch(err => { showToast('Caméra inaccessible'); closeCameraModal(); });
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('camera-preview');
+            const canvas = document.getElementById('camera-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const photoData = canvas.toDataURL('image/jpeg', 0.8);
+
+            if (currentPhotoType === 'before') {
+                photoBeforeData = photoData;
+                document.getElementById('photoBefore').innerHTML = `<img src="${photoData}">`;
+                document.getElementById('photoBefore').classList.add('has-photo');
+            } else {
+                photoAfterData = photoData;
+                document.getElementById('photoAfter').innerHTML = `<img src="${photoData}">`;
+                document.getElementById('photoAfter').classList.add('has-photo');
+            }
+            closeCameraModal();
+            showToast('Photo enregistrée');
+        }
+
+        function closeCameraModal() {
+            if (mediaStream) mediaStream.getTracks().forEach(track => track.stop());
+            document.getElementById('cameraModal').classList.remove('active');
+        }
+
+        async function openPartModal() {
+            const response = await fetch('/api/parts');
+            const parts = await response.json();
+            document.getElementById('partListModal').innerHTML = parts.map(p => `
+                <div class="part-select-item" onclick="selectPart('${p.id}', '${p.name}', ${p.unit_price})">
+                    <div><strong>${p.name}</strong><br><small>${p.reference} - ${p.unit_price} MAD</small></div>
+                    <div>➕</div>
+                </div>
+            `).join('');
+            document.getElementById('partModal').classList.add('active');
+        }
+
+        function selectPart(id, name, price) {
+            pendingPart = { id, name, price };
+            document.getElementById('partQuantity').value = 1;
+            closePartModal();
+            document.getElementById('quantityModal').classList.add('active');
+        }
+
+        function confirmAddPart() {
+            const quantity = parseInt(document.getElementById('partQuantity').value);
+            if (pendingPart && quantity > 0) {
+                selectedParts.push({ ...pendingPart, quantity });
+                document.getElementById('partsList').innerHTML = renderPartsList();
+                showToast(`✅ ${pendingPart.name} ajouté`);
+                pendingPart = null;
+            }
+            closeQuantityModal();
+        }
+
+        function removePart(index) {
+            selectedParts.splice(index, 1);
+            document.getElementById('partsList').innerHTML = renderPartsList();
+        }
+
+        function closePartModal() { document.getElementById('partModal').classList.remove('active'); }
+        function closeQuantityModal() { document.getElementById('quantityModal').classList.remove('active'); }
+
+        function openSignatureModal() {
+            document.getElementById('signatureModal').classList.add('active');
+            setTimeout(() => {
+                const canvas = document.getElementById('signatureCanvas');
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.strokeStyle = '#1B2D4F';
+                ctx.lineWidth = 2;
+                let drawing = false;
+                const getPos = (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const scaleX = canvas.width / rect.width;
+                    const scaleY = canvas.height / rect.height;
+                    let clientX, clientY;
+                    if (e.touches) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+                    else { clientX = e.clientX; clientY = e.clientY; }
+                    return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+                };
+                const start = (e) => { e.preventDefault(); drawing = true; const { x, y } = getPos(e); ctx.beginPath(); ctx.moveTo(x, y); };
+                const draw = (e) => { if (!drawing) return; e.preventDefault(); const { x, y } = getPos(e); ctx.lineTo(x, y); ctx.stroke(); };
+                const stop = () => { drawing = false; ctx.beginPath(); };
+                canvas.addEventListener('mousedown', start); canvas.addEventListener('mousemove', draw);
+                canvas.addEventListener('mouseup', stop); canvas.addEventListener('touchstart', start);
+                canvas.addEventListener('touchmove', draw); canvas.addEventListener('touchend', stop);
+            }, 100);
+        }
+
+        function clearSignature() {
+            const canvas = document.getElementById('signatureCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = 'white';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        function saveSignature() {
+            signatureData = document.getElementById('signatureCanvas').toDataURL('image/png');
+            document.getElementById('signaturePreview').innerHTML = `<img src="${signatureData}">`;
+            closeSignatureModal();
+            showToast('Signature enregistrée');
+        }
+
+        function closeSignatureModal() { document.getElementById('signatureModal').classList.remove('active'); }
+
+        async function startMission(missionId) {
+            await fetch(`/api/technician/mission/${missionId}/start`, { method: 'POST' });
+            showToast('Mission démarrée');
+            loadMissions();
+            if (currentMission === missionId) loadReportForm(missionId);
+        }
+
+        async function submitReport(missionId) {
+            if (!photoBeforeData) { showToast('Photo AVANT requise'); return; }
+            if (!photoAfterData) { showToast('Photo APRÈS requise'); return; }
+            if (!signatureData) { showToast('Signature requise'); return; }
+
+            const report = {
+                intervention_id: missionId,
+                notes: document.getElementById('reportNotes')?.value || '',
+                parts_used: selectedParts,
+                photos_before: photoBeforeData,
+                photos_after: photoAfterData,
+                signature: signatureData
+            };
+
+            const response = await fetch('/api/technician/report', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(report) });
+            if (response.ok) {
+                await fetch(`/api/technician/mission/${missionId}/complete`, { method: 'POST' });
+                showToast('Rapport soumis !');
+                selectedParts = []; photoBeforeData = null; photoAfterData = null; signatureData = null;
+                showScreen('missions'); switchTab('missions'); loadMissions();
+            }
+        }
+
+        async function loadLocationContent() {
+            document.getElementById('locationContent').innerHTML = `
+                <div class="report-section">
+                    <div class="section-title">📍 Ma position</div>
+                    <div class="location-box">
+                        <div class="location-info"><div class="location-icon">📍</div><div class="location-details"><div class="location-address">Position actuelle</div><div class="location-coords" id="currentCoords">--</div></div></div>
+                        <button class="btn-locate" onclick="getCurrentLocation()">🎯 Mettre à jour</button>
+                    </div>
+                </div>
+                <div class="report-section">
+                    <div class="section-title">🏠 Client</div>
+                    <div class="location-box" id="clientLocationInfo">
+                        <div class="location-info"><div class="location-icon">🏠</div><div class="location-details"><div class="location-address">Sélectionnez une mission</div></div></div>
+                        <button class="btn-locate" onclick="navigateToClient()">🗺️ Naviguer</button>
+                    </div>
+                </div>`;
+            getCurrentLocation();
+            if (currentMission) loadClientLocation(currentMission);
+            else { const res = await fetch('/api/technician/missions'); const missions = await res.json(); const active = missions.find(m => m.status === 'in_progress'); if (active) { currentMission = active.id; loadClientLocation(currentMission); } }
+        }
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(async (pos) => {
+                    document.getElementById('currentCoords').innerHTML = `Lat: ${pos.coords.latitude.toFixed(6)}, Lng: ${pos.coords.longitude.toFixed(6)}`;
+                    await fetch('/api/technician/update-location', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ lat: pos.coords.latitude, lng: pos.coords.longitude }) });
+                    showToast('Position mise à jour');
+                }, () => showToast('Position inaccessible'));
+            }
+        }
+
+        async function loadClientLocation(missionId) {
+            const res = await fetch(`/api/technician/mission/${missionId}/client-location`);
+            const data = await res.json();
+            document.getElementById('clientLocationInfo').innerHTML = `
+                <div class="location-info"><div class="location-icon">🏠</div><div class="location-details"><div class="location-address">${data.address || data.client_name}</div></div></div>
+                <button class="btn-locate" onclick="navigateToClient()">🗺️ Naviguer</button>`;
+        }
+
+        function navigateToClient() {
+            if (currentMission) {
+                fetch(`/api/technician/mission/${currentMission}/client-location`).then(res => res.json()).then(data => {
+                    if (data.lat && data.lng) window.open(`https://www.google.com/maps/search/?api=1&query=${data.lat},${data.lng}`, '_blank');
+                    else showToast('Coordonnées non disponibles');
+                });
+            } else showToast('Sélectionnez une mission');
+        }
+
+        function getCurrentLocationAndUpdate(missionId) { getCurrentLocation(); if (!currentMission) currentMission = missionId; loadClientLocation(missionId); showToast('Position envoyée'); }
+        function callClient(phone) { window.location.href = `tel:${phone}`; }
+        function escapeHtml(text) { if (!text) return ''; return text.replace(/[&<>]/g, function(m) { if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; return m; }); }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        loadMissions();
+    </script>
+</body>
+</html>
+
