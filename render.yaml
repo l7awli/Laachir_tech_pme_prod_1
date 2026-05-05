@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: laachir-tech
+    env: docker
+    dockerfilePath: ./Dockerfile
+    # Render injects $PORT automatically - overrides Dockerfile CMD
+    dockerCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 wsgi:app
+    plan: free
+    healthCheckPath: /login
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        # On Render free tier, SQLite is not persisted across deploys.
+        # Set this to a Neon or Supabase PostgreSQL URL for persistent data.
+        # Free PostgreSQL: https://neon.tech  or  https://supabase.com
+        value: sqlite:///laachir_tech.db
+      - key: FLASK_ENV
+        value: production
