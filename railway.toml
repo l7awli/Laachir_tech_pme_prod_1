@@ -4,7 +4,7 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 # Railway injects $PORT automatically - this overrides the Dockerfile CMD
-startCommand = "gunicorn --bind 0.0.0.0:8000 --workers 2 --threads 2 --timeout 120 wsgi:app"
+startCommand = "gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 wsgi:app"
 healthcheckPath = "/login"
 healthcheckTimeout = 30
 restartPolicyType = "ON_FAILURE"
