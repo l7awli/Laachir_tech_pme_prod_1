@@ -18,6 +18,9 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p instance logs static/uploads
 
+# Make start script executable
+RUN chmod +x start.sh
+
 # Create non-root user
 RUN useradd -m -u 1000 appuser && chown -R appuser:appuser /app
 USER appuser
@@ -25,6 +28,6 @@ USER appuser
 # Expose port
 EXPOSE 8000
 
-# Run with gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "--workers", "4", "--threads", "2", "--timeout", "120", "wsgi:app"]
+# Use shell script so $PORT env var is expanded correctly on Railway/Render
+CMD ["/bin/sh", "start.sh"]
 

@@ -3,8 +3,8 @@ services:
     name: laachir-tech
     env: docker
     dockerfilePath: ./Dockerfile
-    # Render injects $PORT automatically - overrides Dockerfile CMD
-    dockerCommand: gunicorn --bind 0.0.0.0:$PORT --workers 2 --threads 2 --timeout 120 wsgi:app
+    # start.sh reads $PORT injected by Render and falls back to 8000
+    dockerCommand: /bin/sh start.sh
     plan: free
     healthCheckPath: /login
     envVars:
